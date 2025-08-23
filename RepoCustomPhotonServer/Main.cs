@@ -29,6 +29,8 @@ internal sealed class RepoCustomPhotonServer : BaseUnityPlugin
     public ConfigEntry<bool> isChangeSteamAppId;
     public ConfigEntry<string> AppIdRealtime;
     public ConfigEntry<string> AppIdVoice;
+    public ConfigEntry<string> ServerAddress;
+    public ConfigEntry<int> ServerPort;
     public static RepoCustomPhotonServer Instance { get; private set; }
 
     internal static AuthTicket steamAuthTicket;
@@ -42,6 +44,8 @@ internal sealed class RepoCustomPhotonServer : BaseUnityPlugin
         isChangeSteamAppId = Config.Bind("General", "Change SteamAppId", false);
         AppIdRealtime = Config.Bind("Photon AppIDs", "AppIdRealtime", "", new ConfigDescription("Photon Realtime App ID", null));
         AppIdVoice = Config.Bind("Photon AppIDs", "AppIdVoice", "", new ConfigDescription("Photon Voice App ID", null));
+        ServerAddress = Config.Bind("Photon Server", "ServerAddress", "127.0.0.1", "Photon server IP/hostname");
+        ServerPort = Config.Bind("Photon Server", "ServerPort", 5055, "Photon server port");
 
         var harmony = new Harmony("RepoCustomPhotonServer");
         harmony.PatchAll();
@@ -237,9 +241,16 @@ internal sealed class RepoCustomPhotonServer : BaseUnityPlugin
         {
             serverSettings.AppSettings.AppIdRealtime = Instance.AppIdRealtime.Value;
             serverSettings.AppSettings.AppIdVoice = Instance.AppIdVoice.Value;
-
+            
+            serverSettings.AppSettings.Server = Instance.ServerAddress.Value;
+            serverSettings.AppSettings.Port = Instance.ServerPort.Value;
+            serverSettings.AppSettings.Protocol = ExitGames.Client.Photon.ConnectionProtocol.Udp;
+            serverSettings.AppSettings.UseNameServer = false; // важно: чтобы не лезло в облако
+            serverSettings.AppSettings.FixedRegion = "";
+        
             logger.LogDebug($"AppIdRealtime: {serverSettings.AppSettings.AppIdRealtime}");
             logger.LogDebug($"AppIdVoice: {serverSettings.AppSettings.AppIdVoice}");
+            logger.LogDebug($"Photon settings updated: {serverSettings.AppSettings.Server}:{serverSettings.AppSettings.Port}");
 
             PhotonNetwork.ConnectUsingSettings();
         }
@@ -325,4 +336,5 @@ internal sealed class RepoCustomPhotonServer : BaseUnityPlugin
             return true;
         }
     }
+
 }
