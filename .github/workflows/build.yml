@@ -19,8 +19,13 @@ jobs:
       with:
         dotnet-version: '6.0.x'
 
+    - name: Download Unity Libs  # <-- Новый шаг здесь!
+      run: |
+        curl -L https://unity.bepinex.dev/libraries/2022.3.21.zip -o unity_libs.zip
+        unzip unity_libs.zip -d RepoCustomPhotonServer/core/
+
     - name: Restore dependencies
-      run: dotnet restore RepoCustomPhotonServer/RepoCustomPhotonServer.csproj --source https://nuget.bepinex.dev/v3/index.json --source https://nuget.spacewarp.org/v3/index.json --source https://api.nuget.org/v3/index.json
+      run: dotnet restore RepoCustomPhotonServer/RepoCustomPhotonServer.csproj --source https://nuget.bepinex.dev/v3/index.json --source https://api.nuget.org/v3/index.json
 
     - name: Build project
       run: dotnet build RepoCustomPhotonServer/RepoCustomPhotonServer.csproj --configuration Release --no-restore
