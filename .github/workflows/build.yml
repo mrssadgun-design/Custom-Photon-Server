@@ -13,20 +13,26 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
+    
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '6.0.x'  # Matches netstandard2.1 requirements
-
+        dotnet-version: '6.0.x'
+    
+    - name: Add BepInEx NuGet Source
+      run: dotnet nuget add source https://nuget.bepinex.dev/v3/index.json --name BepInEx
+    
+    - name: Add SpaceWarp NuGet Source  # Для UnityEngine.Modules, если используете версию 2022.3.5
+      run: dotnet nuget add source https://nuget.spacewarp.org/v3/index.json --name SpaceWarp
+    
     - name: Restore dependencies
       run: dotnet restore RepoCustomPhotonServer/RepoCustomPhotonServer.csproj
-
+    
     - name: Build project
       run: dotnet build RepoCustomPhotonServer/RepoCustomPhotonServer.csproj --configuration Release --no-restore
-
+    
     - name: Upload DLL artifact
       uses: actions/upload-artifact@v4
       with:
         name: RepoCustomPhotonServer-DLL
-        path: RepoCustomPhotonServer/bin/Release/netstandard2.1/RepoCustomPhotonServer.dll  # Adjust if your output path differs
+        path: RepoCustomPhotonServer/bin/Release/netstandard2.1/RepoCustomPhotonServer.dll
